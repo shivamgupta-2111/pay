@@ -1,16 +1,21 @@
 "use client";
 import { useMemo, useState } from "react";
-import { Search, Plus, Download, Pencil, Trash2, CheckCheck, Flag } from "lucide-react";
+import { Search, Plus, Download, Pencil, Trash2, CheckCheck, Flag, BellRing, IndianRupee, Printer, NotebookPen } from "lucide-react";
 import { useMe, useStore } from "@/store/useStore";
 import { can } from "@/lib/permissions";
 import type { Payment } from "@/lib/types";
 import { downloadCSV, effectiveStatus, fmtDate, money } from "@/lib/format";
 import { ApprovalBadge, StatusBadge } from "./ui";
 import PaymentForm from "./PaymentForm";
+import { FollowUpModal, RecordPaymentModal, ReminderModal } from "./PaymentActions";
+import { isRemindable, printInvoice } from "@/lib/billing";
 
 export default function PaymentsView() {
   const me = useMe()!;
-  const { payments, users, settings, deletePayment, requestDelete, markPaid } = useStore();
+  const { payments, users, customers, products, settings, deletePayment, requestDelete, markPaid } = useStore();
+  const [remind, setRemind] = useState<Payment | null>(null);
+  const [record, setRecord] = useState<Payment | null>(null);
+  const [follow, setFollow] = useState<Payment | null>(null);
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("all");
   const [approval, setApproval] = useState("all");
@@ -27,7 +32,7 @@ export default function PaymentsView() {
     const scoped = can(role, "payments:view_all") ? payments : payments.filter((p) => p.repId === me.id);
     return scoped.filter((p) => {
       const s = q.toLowerCase();
-      if (s && !`${p.title} ${p.customer} ${p.amount} ${p.notes ?? ""}`.toLowerCase().includes(s)) return false;
+      if (s && !`${p.title} ${p.invoiceNo ?? ""} ${p.customer} ${p.amount} ${p.notes ?? ""}`.toLowerCase().includes(s)) return false;
       if (status !== "all" && effectiveStatus(p) !== status) return false;
       if (approval !== "all" && p.approval !== approval) return false;
       if (type !== "all" && p.type !== type) return false;
@@ -58,7 +63,7 @@ export default function PaymentsView() {
           <input className="input" placeholder="Search title, customer, amount…" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <select className="select" value={status} onChange={(e) => setStatus(e.target.value)}>
-          <option value="all">All status</option><option value="paid">Paid</option><option value="pending">Pending</option><option value="overdue">Overdue</option>
+          <option value="all">All status</option><option value="paid">Paid</option><option value="partial">Partial</option><option value="pending">Pending</option><option value="overdue">Overdue</option>
         </select>
         <select className="select" value={approval} onChange={(e) => setApproval(e.target.value)}>
           <option value="all">All approvals</option><option value="pending_admin">Awaiting Admin</option><option value="pending_ceo">Awaiting CEO</option>
@@ -93,13 +98,14 @@ export default function PaymentsView() {
               return (
                 <tr key={p.id}>
                   <td>
-                    <div style={{ fontWeight: 600 }}>{p.title}</div>
+                    <div style={{ fontWeight: 600 }}>{p.invoiceNo ? `${p.invoiceNo} · ` : ""}{p.title}</div>
                     <div className="muted">{p.customer} · {p.category} · {p.method}</div>
                     {p.approval === "rejected" && p.rejectReason && <div className="muted" style={{ color: "var(--red)" }}>Reason: {p.rejectReason}</div>}
                     {p.deleteRequested && <div className="muted" style={{ color: "var(--orange-dark)" }}>Deletion requested</div>}
                   </td>
                   <td className={p.type === "incoming" ? "amount-in" : "amount-out"}>
                     {p.type === "incoming" ? "+" : "−"}{money(p.amount, settings.currency)}
+                    {p.paidAmount > 0 && p.status !== "paid" && <div className="muted">paid {money(p.paidAmount, settings.currency)}</div>}
                   </td>
                   <td>{fmtDate(p.dueDate)}</td>
                   <td><StatusBadge s={s} /></td>
@@ -107,8 +113,16 @@ export default function PaymentsView() {
                   {can(role, "payments:view_all") && <td>{repName(p.repId)}</td>}
                   <td>
                     <div className="actions">
-                      {can(role, "payments:mark_paid") && p.status !== "paid" && p.approval === "approved" && (
-                        <button className="icon-btn" title="Mark as paid" onClick={() => markPaid(p.id)}><CheckCheck size={16} /></button>
+                      {isRemindable(p) && <button className="icon-btn" title="Send reminder" onClick={() => setRemind(p)}><BellRing size={16} /></button>}
+                      {isRemindable(p) && <button className="icon-btn" title="Log follow-up" onClick={() => setFollow(p)}><NotebookPen size={16} /></button>}
+                      {can(role, "payments:record") && p.status !== "paid" && p.approval === "approved" && (
+                        <button className="icon-btn" title="Record payment (full / partial)" onClick={() => setRecord(p)}><IndianRupee size={16} /></button>
+                      )}
+                      {role !== "rep" && p.status !== "paid" && p.approval === "approved" && (
+                        <button className="icon-btn" title="Mark fully paid" onClick={() => markPaid(p.id)}><CheckCheck size={16} /></button>
+                      )}
+                      {p.type === "incoming" && (
+                        <button className="icon-btn" title="Print invoice" onClick={() => printInvoice(p, customers.find((c) => c.id === p.customerId), products.find((x) => x.id === p.productId), settings)}><Printer size={16} /></button>
                       )}
                       {canEdit(p) && <button className="icon-btn" title="Edit" onClick={() => setEditing(p)}><Pencil size={16} /></button>}
                       {can(role, "payments:delete") && (
@@ -127,6 +141,9 @@ export default function PaymentsView() {
         </table>
       </div>
 
+      {remind && <ReminderModal payment={remind} onClose={() => setRemind(null)} />}
+      {record && <RecordPaymentModal payment={record} onClose={() => setRecord(null)} />}
+      {follow && <FollowUpModal payment={follow} onClose={() => setFollow(null)} />}
       {creating && <PaymentForm onClose={() => setCreating(false)} />}
       {editing && <PaymentForm payment={editing} onClose={() => setEditing(null)} />}
     </div>

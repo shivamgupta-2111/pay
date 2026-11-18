@@ -10,11 +10,11 @@ const short = (n: number) => (n >= 100000 ? `${(n / 100000).toFixed(1)}L` : n >=
 
 export function MonthlyChart({ payments, currency }: { payments: Payment[]; currency: string }) {
   const data = lastMonths(6).map((k) => {
-    const inMonth = payments.filter((p) => monthKey(p.dueDate) === k && p.status === "paid");
+    const inMonth = payments.filter((p) => monthKey(p.dueDate) === k);
     return {
       month: monthLabel(k),
-      Received: inMonth.filter((p) => p.type === "incoming").reduce((a, p) => a + p.amount, 0),
-      Paid: inMonth.filter((p) => p.type === "outgoing").reduce((a, p) => a + p.amount, 0),
+      Collected: inMonth.filter((p) => p.type === "incoming").reduce((a, p) => a + p.paidAmount, 0),
+      Spent: inMonth.filter((p) => p.type === "outgoing").reduce((a, p) => a + p.paidAmount, 0),
     };
   });
   return (
@@ -25,8 +25,8 @@ export function MonthlyChart({ payments, currency }: { payments: Payment[]; curr
         <YAxis tickLine={false} axisLine={false} fontSize={12} tickFormatter={short} width={48} />
         <Tooltip formatter={(v) => money(Number(v), currency)} cursor={{ fill: "rgba(232,119,34,0.06)" }} />
         <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} />
-        <Bar dataKey="Received" fill="#e87722" radius={[6, 6, 0, 0]} />
-        <Bar dataKey="Paid" fill="#1a1a2e" radius={[6, 6, 0, 0]} />
+        <Bar dataKey="Collected" fill="#e87722" radius={[6, 6, 0, 0]} />
+        <Bar dataKey="Spent" fill="#1a1a2e" radius={[6, 6, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );

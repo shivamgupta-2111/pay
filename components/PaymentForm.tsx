@@ -7,7 +7,7 @@ import { Modal } from "./ui";
 
 export default function PaymentForm({ payment, onClose }: { payment?: Payment; onClose: () => void }) {
   const me = useMe()!;
-  const { settings, users, addPayment, updatePayment } = useStore();
+  const { settings, users, customers, addPayment, updatePayment } = useStore();
   const reps = users.filter((u) => u.role === "rep" && u.active);
 
   const [f, setF] = useState({
@@ -39,8 +39,11 @@ export default function PaymentForm({ payment, onClose }: { payment?: Payment; o
       type: f.type as Payment["type"],
       status: (me.role === "rep" ? "pending" : f.status) as Payment["status"],
     };
-    if (payment) updatePayment(payment.id, data);
-    else addPayment(data);
+    const customerId = customers.find((c) => c.name.toLowerCase() === f.customer.trim().toLowerCase())?.id;
+    if (payment) {
+      const paidAmount = data.status === "paid" ? amount : Math.min(payment.paidAmount, amount);
+      updatePayment(payment.id, { ...data, customerId: customerId ?? payment.customerId, paidAmount, status: paidAmount >= amount ? "paid" : data.status });
+    } else addPayment({ ...data, customerId });
     onClose();
   };
 
@@ -49,7 +52,8 @@ export default function PaymentForm({ payment, onClose }: { payment?: Payment; o
       <form onSubmit={submit}>
         <div className="form-grid">
           <div className="field full"><label>Title *</label><input className="input" value={f.title} onChange={set("title")} placeholder="Invoice #INV-2001" /></div>
-          <div className="field"><label>Customer / Payee *</label><input className="input" value={f.customer} onChange={set("customer")} /></div>
+          <div className="field"><label>Customer / Payee *</label><input className="input" list="customer-list" value={f.customer} onChange={set("customer")} />
+            <datalist id="customer-list">{customers.filter((c) => me.role !== "rep" || c.repId === me.id).map((c) => <option key={c.id} value={c.name} />)}</datalist></div>
           <div className="field"><label>Amount ({settings.currency}) *</label><input className="input" type="number" min="1" value={f.amount} onChange={set("amount")} /></div>
           <div className="field">
             <label>Type</label>

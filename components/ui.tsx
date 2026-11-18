@@ -31,7 +31,7 @@ export function StatCard({
   );
 }
 
-const STATUS_CLASS: Record<EffectiveStatus, string> = { paid: "b-green", pending: "b-orange", overdue: "b-red" };
+const STATUS_CLASS: Record<EffectiveStatus, string> = { paid: "b-green", partial: "b-blue", pending: "b-orange", overdue: "b-red" };
 export function StatusBadge({ s }: { s: EffectiveStatus }) {
   return <span className={`badge ${STATUS_CLASS[s]}`}>{s[0].toUpperCase() + s.slice(1)}</span>;
 }

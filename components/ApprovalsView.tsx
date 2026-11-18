@@ -33,13 +33,18 @@ export default function ApprovalsView() {
                 <div className="title">{p.title}</div>
                 <div className="muted">{p.customer} · {p.category} · due {fmtDate(p.dueDate)} · by {repName(p.repId)}</div>
                 {p.notes && <div className="muted">“{p.notes}”</div>}
+                {p.receipts.filter((r) => !r.verified).map((r) => (
+                  <div key={r.id} className="badge b-blue" style={{ marginTop: 4 }}>
+                    Collection to verify: {money(r.amount, settings.currency)} via {r.method}{r.reference ? ` · ${r.reference}` : ""} on {fmtDate(r.date)}
+                  </div>
+                ))}
               </div>
               <div className="amt">{money(p.amount, settings.currency)}</div>
               <button className="btn btn-danger btn-sm" onClick={() => { setRejecting(p.id); setReason(""); }}><X size={14} /> Reject</button>
               {escalate ? (
                 <button className="btn btn-dark btn-sm" onClick={() => approve(p.id)}><ArrowUpRight size={14} /> Forward to CEO</button>
               ) : (
-                <button className="btn btn-success btn-sm" onClick={() => approve(p.id)}><Check size={14} /> Approve</button>
+                <button className="btn btn-success btn-sm" onClick={() => approve(p.id)}><Check size={14} /> {p.receipts.some((r) => !r.verified) ? "Verify" : "Approve"}</button>
               )}
             </div>
           );

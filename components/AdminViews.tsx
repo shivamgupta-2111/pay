@@ -4,7 +4,8 @@ import { Plus, Pencil, X, UserX, UserCheck } from "lucide-react";
 import { useMe, useStore } from "@/store/useStore";
 import { ROLE_LABEL } from "@/lib/permissions";
 import type { User } from "@/lib/types";
-import { fmtDate, money, monthKey, todayISO } from "@/lib/format";
+import { balance, fmtDate, money, monthKey, todayISO } from "@/lib/format";
+import { ReminderSettings } from "./ReminderSettings";
 import { Modal, Progress, initials } from "./ui";
 
 /* ---------------- Users (Admin) ---------------- */
@@ -124,6 +125,7 @@ export function SettingsView() {
             Rep submits → Admin reviews → amounts above the limit come to the CEO → rep is notified of the outcome.
           </div>
         </div>
+        <div style={{ gridColumn: "1 / -1" }}><ReminderSettings /></div>
       </div>
     );
   }
@@ -137,6 +139,7 @@ export function SettingsView() {
         <div className="value">{money(settings.adminLimit, settings.currency)}</div>
         <div className="hint">Payments above this are forwarded to the CEO.</div>
       </div>
+      <div style={{ gridColumn: "1 / -1" }}><ReminderSettings /></div>
     </div>
   );
 }
@@ -176,8 +179,8 @@ export function TeamView() {
   const rows = reps
     .map((r) => {
       const mine = payments.filter((p) => p.repId === r.id && p.type === "incoming" && p.approval === "approved");
-      const collected = mine.filter((p) => p.status === "paid" && monthKey(p.dueDate) === thisMonth).reduce((a, p) => a + p.amount, 0);
-      const outstanding = mine.filter((p) => p.status !== "paid").reduce((a, p) => a + p.amount, 0);
+      const collected = mine.filter((p) => monthKey(p.dueDate) === thisMonth).reduce((a, p) => a + p.paidAmount, 0);
+      const outstanding = mine.reduce((a, p) => a + balance(p), 0);
       return { r, collected, outstanding, pct: r.target ? Math.round((collected / r.target) * 100) : 0 };
     })
     .sort((a, b) => b.pct - a.pct);
@@ -240,44 +243,3 @@ export function AuditView() {
   );
 }
 
-/* ---------------- Customers (Rep) ---------------- */
-export function CustomersView() {
-  const me = useMe()!;
-  const { payments, settings } = useStore();
-  const mine = payments.filter((p) => p.repId === me.id && p.type === "incoming");
-  const map = new Map<string, { total: number; paid: number; due: number; last: string; count: number }>();
-  mine.forEach((p) => {
-    const c = map.get(p.customer) ?? { total: 0, paid: 0, due: 0, last: "", count: 0 };
-    c.total += p.amount;
-    c.count++;
-    if (p.status === "paid") c.paid += p.amount;
-    else if (p.approval === "approved") c.due += p.amount;
-    if (p.dueDate > c.last) c.last = p.dueDate;
-    map.set(p.customer, c);
-  });
-  const rows = [...map.entries()].sort((a, b) => b[1].due - a[1].due);
-
-  return (
-    <div className="card">
-      <div className="card-title">My customers</div>
-      <div className="table-wrap">
-        <table>
-          <thead><tr><th>Customer</th><th>Invoices</th><th>Total billed</th><th>Collected</th><th>Outstanding</th><th>Last activity</th></tr></thead>
-          <tbody>
-            {rows.map(([name, c]) => (
-              <tr key={name}>
-                <td style={{ fontWeight: 600 }}>{name}</td>
-                <td>{c.count}</td>
-                <td>{money(c.total, settings.currency)}</td>
-                <td className="amount-in">{money(c.paid, settings.currency)}</td>
-                <td style={{ fontWeight: 700, color: c.due ? "var(--orange-dark)" : undefined }}>{money(c.due, settings.currency)}</td>
-                <td className="muted">{c.last ? fmtDate(c.last) : "—"}</td>
-              </tr>
-            ))}
-            {!rows.length && <tr><td colSpan={6} className="empty">No customers yet.</td></tr>}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
