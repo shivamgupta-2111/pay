@@ -1,6 +1,6 @@
 "use client";
+import { Icon } from "@/components/Icon";
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
 import type { Approval } from "@/lib/types";
 import type { EffectiveStatus } from "@/lib/format";
 import { useMe } from "@/store/useStore";
@@ -53,7 +53,7 @@ export function Modal({ title, onClose, children }: { title: string; onClose: ()
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-head">
           <h2>{title}</h2>
-          <button className="icon-btn" onClick={onClose} aria-label="Close"><X size={18} /></button>
+          <button className="icon-btn" onClick={onClose} aria-label="Close"><Icon name="close" size={18} /></button>
         </div>
         {children}
       </div>

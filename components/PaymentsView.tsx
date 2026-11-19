@@ -1,6 +1,6 @@
 "use client";
+import { Icon } from "@/components/Icon";
 import { useMemo, useState } from "react";
-import { Search, Plus, Download, Pencil, Trash2, CheckCheck, Flag, BellRing, IndianRupee, Printer, NotebookPen } from "lucide-react";
 import { useMe, useStore } from "@/store/useStore";
 import { can } from "@/lib/permissions";
 import type { Payment } from "@/lib/types";
@@ -59,7 +59,7 @@ export default function PaymentsView() {
     <div className="card">
       <div className="toolbar">
         <div className="search">
-          <Search size={16} />
+          <Icon name="search" size={16} />
           <input className="input" placeholder="Search title, customer, amount…" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <select className="select" value={status} onChange={(e) => setStatus(e.target.value)}>
@@ -77,8 +77,8 @@ export default function PaymentsView() {
             <option value="all">All reps</option>{reps.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
           </select>
         )}
-        <button className="btn" onClick={exportCSV}><Download size={16} /> Export</button>
-        {can(role, "payments:create") && <button className="btn btn-primary" onClick={() => setCreating(true)}><Plus size={16} /> New payment</button>}
+        <button className="btn" onClick={exportCSV}><Icon name="download" size={16} /> Export</button>
+        {can(role, "payments:create") && <button className="btn btn-primary" onClick={() => setCreating(true)}><Icon name="add" size={16} /> New payment</button>}
       </div>
 
       <p className="muted" style={{ marginBottom: 10 }}>{rows.length} records · Net {money(total, settings.currency)}</p>
@@ -113,23 +113,23 @@ export default function PaymentsView() {
                   {can(role, "payments:view_all") && <td>{repName(p.repId)}</td>}
                   <td>
                     <div className="actions">
-                      {isRemindable(p) && <button className="icon-btn" title="Send reminder" onClick={() => setRemind(p)}><BellRing size={16} /></button>}
-                      {isRemindable(p) && <button className="icon-btn" title="Log follow-up" onClick={() => setFollow(p)}><NotebookPen size={16} /></button>}
+                      {isRemindable(p) && <button className="icon-btn" title="Send reminder" onClick={() => setRemind(p)}><Icon name="reminder" size={16} /></button>}
+                      {isRemindable(p) && <button className="icon-btn" title="Log follow-up" onClick={() => setFollow(p)}><Icon name="followUp" size={16} /></button>}
                       {can(role, "payments:record") && p.status !== "paid" && p.approval === "approved" && (
-                        <button className="icon-btn" title="Record payment (full / partial)" onClick={() => setRecord(p)}><IndianRupee size={16} /></button>
+                        <button className="icon-btn" title="Record payment (full / partial)" onClick={() => setRecord(p)}><Icon name="rupee" size={16} /></button>
                       )}
                       {role !== "rep" && p.status !== "paid" && p.approval === "approved" && (
-                        <button className="icon-btn" title="Mark fully paid" onClick={() => markPaid(p.id)}><CheckCheck size={16} /></button>
+                        <button className="icon-btn" title="Mark fully paid" onClick={() => markPaid(p.id)}><Icon name="markPaid" size={16} /></button>
                       )}
                       {p.type === "incoming" && (
-                        <button className="icon-btn" title="Print invoice" onClick={() => printInvoice(p, customers.find((c) => c.id === p.customerId), products.find((x) => x.id === p.productId), settings)}><Printer size={16} /></button>
+                        <button className="icon-btn" title="Print invoice" onClick={() => printInvoice(p, customers.find((c) => c.id === p.customerId), products.find((x) => x.id === p.productId), settings)}><Icon name="print" size={16} /></button>
                       )}
-                      {canEdit(p) && <button className="icon-btn" title="Edit" onClick={() => setEditing(p)}><Pencil size={16} /></button>}
+                      {canEdit(p) && <button className="icon-btn" title="Edit" onClick={() => setEditing(p)}><Icon name="edit" size={16} /></button>}
                       {can(role, "payments:delete") && (
-                        <button className="icon-btn" title="Delete" onClick={() => confirm(`Delete "${p.title}"?`) && deletePayment(p.id)}><Trash2 size={16} /></button>
+                        <button className="icon-btn" title="Delete" onClick={() => confirm(`Delete "${p.title}"?`) && deletePayment(p.id)}><Icon name="delete" size={16} /></button>
                       )}
                       {can(role, "payments:request_delete") && !p.deleteRequested && (
-                        <button className="icon-btn" title="Request deletion" onClick={() => confirm("Ask Admin to delete this entry?") && requestDelete(p.id)}><Flag size={16} /></button>
+                        <button className="icon-btn" title="Request deletion" onClick={() => confirm("Ask Admin to delete this entry?") && requestDelete(p.id)}><Icon name="flag" size={16} /></button>
                       )}
                     </div>
                   </td>

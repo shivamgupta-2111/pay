@@ -1,15 +1,16 @@
 "use client";
+import { Icon } from "@/components/Icon";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Crown, ShieldCheck, Briefcase, Wallet, ChevronRight } from "lucide-react";
 import { useStore } from "@/store/useStore";
 import type { Role } from "@/lib/types";
 import { useHydrated } from "@/components/ui";
+import { Logo } from "@/components/Logo";
 
 const ROLES: { role: Role; title: string; desc: string; icon: React.ReactNode }[] = [
-  { role: "ceo", title: "CEO", desc: "Company overview, final approvals, targets & limits", icon: <Crown size={20} /> },
-  { role: "admin", title: "Admin", desc: "Manage users, payments, approvals & settings", icon: <ShieldCheck size={20} /> },
-  { role: "rep", title: "Sales Rep", desc: "Record collections, track your target & customers", icon: <Briefcase size={20} /> },
+  { role: "ceo", title: "CEO", desc: "Company overview, final approvals, targets & limits", icon: <Icon name="ceo" size={20} /> },
+  { role: "admin", title: "Admin", desc: "Manage users, payments, approvals & settings", icon: <Icon name="admin" size={20} /> },
+  { role: "rep", title: "Sales Rep", desc: "Record collections, track your target & customers", icon: <Icon name="rep" size={20} /> },
 ];
 
 export default function LoginPage() {
@@ -29,9 +30,7 @@ export default function LoginPage() {
   return (
     <div className="login">
       <div className="login-hero">
-        <div className="brand" style={{ padding: 0 }}>
-          <div className="brand-logo"><Wallet size={18} /></div> PayTrack
-        </div>
+        <div style={{ marginLeft: -8 }}><Logo height={40} /></div>
         <div>
           <h1>Every payment, <span>tracked</span> and approved.</h1>
           <p>One place for your CEO, admins and sales reps to record collections, approve payments and see where the money is.</p>
@@ -51,7 +50,7 @@ export default function LoginPage() {
                 <div style={{ fontWeight: 700 }}>{r.title}</div>
                 <div className="muted">{r.desc}</div>
               </div>
-              <ChevronRight size={18} color="var(--text-muted)" />
+              <Icon name="chevronRight" size={18} color="var(--text-muted)" />
             </button>
           ))}
 

@@ -1,48 +1,47 @@
 "use client";
+import { Icon } from "@/components/Icon";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import {
-  LayoutDashboard, CheckCircle2, Wallet, Users, Target, ScrollText, Settings, LogOut, Contact, RotateCcw, Bell, BellRing, Package, Repeat,
-} from "lucide-react";
 import { useMe, useStore } from "@/store/useStore";
 import { ROLE_LABEL } from "@/lib/permissions";
 import type { Role } from "@/lib/types";
 import { needsReminderToday } from "@/lib/billing";
 import { initials, useHydrated } from "./ui";
+import { Logo } from "./Logo";
 
 type NavItem = { href: string; label: string; icon: React.ReactNode; badge?: "approvals" | "reminders" };
 
 const NAV: Record<Role, NavItem[]> = {
   ceo: [
-    { href: "/ceo", label: "Overview", icon: <LayoutDashboard size={18} /> },
-    { href: "/ceo/reminders", label: "Reminders", icon: <BellRing size={18} />, badge: "reminders" },
-    { href: "/ceo/approvals", label: "Approvals", icon: <CheckCircle2 size={18} />, badge: "approvals" },
-    { href: "/ceo/subscriptions", label: "Subscriptions", icon: <Repeat size={18} /> },
-    { href: "/ceo/products", label: "Products", icon: <Package size={18} /> },
-    { href: "/ceo/customers", label: "Customers", icon: <Contact size={18} /> },
-    { href: "/ceo/payments", label: "All Payments", icon: <Wallet size={18} /> },
-    { href: "/ceo/team", label: "Team & Targets", icon: <Target size={18} /> },
-    { href: "/ceo/audit", label: "Audit Log", icon: <ScrollText size={18} /> },
-    { href: "/ceo/settings", label: "Settings", icon: <Settings size={18} /> },
+    { href: "/ceo", label: "Overview", icon: <Icon name="dashboard" size={18} /> },
+    { href: "/ceo/reminders", label: "Reminders", icon: <Icon name="reminder" size={18} />, badge: "reminders" },
+    { href: "/ceo/approvals", label: "Approvals", icon: <Icon name="approvals" size={18} />, badge: "approvals" },
+    { href: "/ceo/subscriptions", label: "Subscriptions", icon: <Icon name="subscription" size={18} /> },
+    { href: "/ceo/products", label: "Products", icon: <Icon name="product" size={18} /> },
+    { href: "/ceo/customers", label: "Customers", icon: <Icon name="customers" size={18} /> },
+    { href: "/ceo/payments", label: "All Payments", icon: <Icon name="wallet" size={18} /> },
+    { href: "/ceo/team", label: "Team & Targets", icon: <Icon name="target" size={18} /> },
+    { href: "/ceo/audit", label: "Audit Log", icon: <Icon name="audit" size={18} /> },
+    { href: "/ceo/settings", label: "Settings", icon: <Icon name="settings" size={18} /> },
   ],
   admin: [
-    { href: "/admin", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
-    { href: "/admin/reminders", label: "Reminders", icon: <BellRing size={18} />, badge: "reminders" },
-    { href: "/admin/approvals", label: "Approvals", icon: <CheckCircle2 size={18} />, badge: "approvals" },
-    { href: "/admin/subscriptions", label: "Subscriptions", icon: <Repeat size={18} /> },
-    { href: "/admin/products", label: "Products", icon: <Package size={18} /> },
-    { href: "/admin/customers", label: "Customers", icon: <Contact size={18} /> },
-    { href: "/admin/payments", label: "Payments", icon: <Wallet size={18} /> },
-    { href: "/admin/users", label: "Users", icon: <Users size={18} /> },
-    { href: "/admin/settings", label: "Settings", icon: <Settings size={18} /> },
+    { href: "/admin", label: "Dashboard", icon: <Icon name="dashboard" size={18} /> },
+    { href: "/admin/reminders", label: "Reminders", icon: <Icon name="reminder" size={18} />, badge: "reminders" },
+    { href: "/admin/approvals", label: "Approvals", icon: <Icon name="approvals" size={18} />, badge: "approvals" },
+    { href: "/admin/subscriptions", label: "Subscriptions", icon: <Icon name="subscription" size={18} /> },
+    { href: "/admin/products", label: "Products", icon: <Icon name="product" size={18} /> },
+    { href: "/admin/customers", label: "Customers", icon: <Icon name="customers" size={18} /> },
+    { href: "/admin/payments", label: "Payments", icon: <Icon name="wallet" size={18} /> },
+    { href: "/admin/users", label: "Users", icon: <Icon name="users" size={18} /> },
+    { href: "/admin/settings", label: "Settings", icon: <Icon name="settings" size={18} /> },
   ],
   rep: [
-    { href: "/rep", label: "My Dashboard", icon: <LayoutDashboard size={18} /> },
-    { href: "/rep/reminders", label: "Reminders", icon: <BellRing size={18} />, badge: "reminders" },
-    { href: "/rep/subscriptions", label: "Subscriptions", icon: <Repeat size={18} /> },
-    { href: "/rep/customers", label: "My Customers", icon: <Contact size={18} /> },
-    { href: "/rep/payments", label: "My Payments", icon: <Wallet size={18} /> },
+    { href: "/rep", label: "My Dashboard", icon: <Icon name="dashboard" size={18} /> },
+    { href: "/rep/reminders", label: "Reminders", icon: <Icon name="reminder" size={18} />, badge: "reminders" },
+    { href: "/rep/subscriptions", label: "Subscriptions", icon: <Icon name="subscription" size={18} /> },
+    { href: "/rep/customers", label: "My Customers", icon: <Icon name="customers" size={18} /> },
+    { href: "/rep/payments", label: "My Payments", icon: <Icon name="wallet" size={18} /> },
   ],
 };
 
@@ -93,10 +92,7 @@ export default function PortalShell({ role, children }: { role: Role; children: 
   return (
     <div className="shell">
       <aside className="sidebar">
-        <div className="brand">
-          <div className="brand-logo"><Wallet size={18} /></div>
-          PayTrack
-        </div>
+        <Logo />
         <span className="role-pill">{ROLE_LABEL[role]} Portal</span>
         <nav className="nav">
           {NAV[role].map((n) => (
@@ -108,7 +104,7 @@ export default function PortalShell({ role, children }: { role: Role; children: 
           ))}
         </nav>
         <button className="btn btn-ghost btn-sm" style={{ color: "var(--text-muted-dark)", marginBottom: 10 }} onClick={() => confirm("Reset all demo data?") && resetDemo()}>
-          <RotateCcw size={14} /> Reset demo data
+          <Icon name="reset" size={14} /> Reset demo data
         </button>
         <div className="user-card">
           <div className="avatar">{initials(me.name)}</div>
@@ -117,7 +113,7 @@ export default function PortalShell({ role, children }: { role: Role; children: 
             <div className="sub">{me.email}</div>
           </div>
           <button className="icon-btn" title="Logout" style={{ color: "var(--text-muted-dark)" }} onClick={() => { logout(); router.push("/login"); }}>
-            <LogOut size={16} />
+            <Icon name="logout" size={16} />
           </button>
         </div>
       </aside>
@@ -130,7 +126,7 @@ export default function PortalShell({ role, children }: { role: Role; children: 
           </div>
           <Link href={`/${role}/reminders`} style={{ position: "relative", display: "flex", alignItems: "center", gap: 8 }} title="Reminders to send today">
             {reminderCount > 0 && <span className="muted" style={{ fontWeight: 600 }}>{reminderCount} reminder{reminderCount > 1 ? "s" : ""} due today</span>}
-            <Bell size={20} color="var(--text-muted)" />
+            <Icon name="bell" size={20} color="var(--text-muted)" />
             {reminderCount > 0 && (
               <span style={{ position: "absolute", top: -6, right: -8, background: "var(--orange-brand)", color: "#fff", fontSize: 10, fontWeight: 700, borderRadius: 999, padding: "1px 6px" }}>
                 {reminderCount}

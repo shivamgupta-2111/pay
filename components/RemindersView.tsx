@@ -1,9 +1,6 @@
 "use client";
+import { Icon } from "@/components/Icon";
 import { useMemo, useState } from "react";
-import {
-  Search, BellRing, AlertTriangle, CalendarClock, CalendarCheck, MessageCircle, Phone, IndianRupee, NotebookPen,
-  Printer, Copy, CheckCheck, AlarmClockOff, BellPlus,
-} from "lucide-react";
 import { useMe, useStore } from "@/store/useStore";
 import type { Payment } from "@/lib/types";
 import { balance, fmtDate, money, timeAgo } from "@/lib/format";
@@ -89,10 +86,10 @@ export default function RemindersView() {
   return (
     <>
       <div className="grid grid-4">
-        <StatCard dark label="Reminders to send today" value={String(groups.today.length)} hint={money(sum(groups.today), cur)} icon={<BellRing size={20} />} />
-        <StatCard label="Overdue" value={money(sum(groups.overdue), cur)} hint={`${groups.overdue.length} invoices`} icon={<AlertTriangle size={20} />} />
-        <StatCard label="Due today" value={money(sum(groups.due), cur)} hint={`${groups.due.length} invoices`} icon={<CalendarCheck size={20} />} />
-        <StatCard label={`Next ${Math.max(...settings.reminderDays, 0)} days`} value={money(sum(groups.upcoming), cur)} hint={`${groups.upcoming.length} invoices`} icon={<CalendarClock size={20} />} />
+        <StatCard dark label="Reminders to send today" value={String(groups.today.length)} hint={money(sum(groups.today), cur)} icon={<Icon name="reminder" size={20} />} />
+        <StatCard label="Overdue" value={money(sum(groups.overdue), cur)} hint={`${groups.overdue.length} invoices`} icon={<Icon name="warning" size={20} />} />
+        <StatCard label="Due today" value={money(sum(groups.due), cur)} hint={`${groups.due.length} invoices`} icon={<Icon name="calendarToday" size={20} />} />
+        <StatCard label={`Next ${Math.max(...settings.reminderDays, 0)} days`} value={money(sum(groups.upcoming), cur)} hint={`${groups.upcoming.length} invoices`} icon={<Icon name="calendarUpcoming" size={20} />} />
       </div>
 
       <div className="card mt">
@@ -105,22 +102,22 @@ export default function RemindersView() {
         </div>
 
         <div className="toolbar">
-          <div className="search"><Search size={16} /><input className="input" placeholder="Search customer, invoice, phone…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
+          <div className="search"><Icon name="search" size={16} /><input className="input" placeholder="Search customer, invoice, phone…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
           {me.role !== "rep" && (
             <select className="select" value={rep} onChange={(e) => setRep(e.target.value)}>
               <option value="all">All reps</option>
               {users.filter((u) => u.role === "rep").map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
             </select>
           )}
-          <button className="btn" onClick={enableAlerts}><BellPlus size={16} /> Desktop alerts</button>
+          <button className="btn" onClick={enableAlerts}><Icon name="alertsOn" size={16} /> Desktop alerts</button>
         </div>
 
         {sel.length > 0 && (
           <div className="bulkbar">
             <b>{sel.length} selected</b>
-            <button className="btn btn-sm" onClick={copyAll}><Copy size={14} /> Copy messages</button>
-            <button className="btn btn-sm" onClick={() => { logReminder(sel, "whatsapp"); flash(`${sel.length} marked as reminded`); setSel([]); }}><CheckCheck size={14} /> Mark reminded</button>
-            <button className="btn btn-sm" onClick={() => { snooze(sel, 3); flash(`Snoozed ${sel.length} for 3 days`); setSel([]); }}><AlarmClockOff size={14} /> Snooze 3 days</button>
+            <button className="btn btn-sm" onClick={copyAll}><Icon name="copy" size={14} /> Copy messages</button>
+            <button className="btn btn-sm" onClick={() => { logReminder(sel, "whatsapp"); flash(`${sel.length} marked as reminded`); setSel([]); }}><Icon name="markPaid" size={14} /> Mark reminded</button>
+            <button className="btn btn-sm" onClick={() => { snooze(sel, 3); flash(`Snoozed ${sel.length} for 3 days`); setSel([]); }}><Icon name="snooze" size={14} /> Snooze 3 days</button>
             <button className="btn btn-ghost btn-sm" onClick={() => setSel([])}>Clear</button>
           </div>
         )}
@@ -163,12 +160,12 @@ export default function RemindersView() {
                     </td>
                     <td>
                       <div className="actions">
-                        <button className="btn btn-primary btn-sm" onClick={() => setRemind(p)}><BellRing size={14} /> Remind</button>
-                        <button className="icon-btn wa" title="Quick WhatsApp" onClick={() => quickWhatsApp(p)}><MessageCircle size={16} /></button>
-                        {c?.phone && <a className="icon-btn" title="Call" href={telLink(c.phone)} onClick={() => { logReminder([p.id], "call"); setFollow(p); }}><Phone size={16} /></a>}
-                        <button className="icon-btn" title="Record payment" onClick={() => setRecord(p)}><IndianRupee size={16} /></button>
-                        <button className="icon-btn" title="Follow-up / promise to pay" onClick={() => setFollow(p)}><NotebookPen size={16} /></button>
-                        <button className="icon-btn" title="Print invoice" onClick={() => printInvoice(p, c, prod(p), settings)}><Printer size={16} /></button>
+                        <button className="btn btn-primary btn-sm" onClick={() => setRemind(p)}><Icon name="reminder" size={14} /> Remind</button>
+                        <button className="icon-btn wa" title="Quick WhatsApp" onClick={() => quickWhatsApp(p)}><Icon name="whatsapp" size={16} /></button>
+                        {c?.phone && <a className="icon-btn" title="Call" href={telLink(c.phone)} onClick={() => { logReminder([p.id], "call"); setFollow(p); }}><Icon name="call" size={16} /></a>}
+                        <button className="icon-btn" title="Record payment" onClick={() => setRecord(p)}><Icon name="rupee" size={16} /></button>
+                        <button className="icon-btn" title="Follow-up / promise to pay" onClick={() => setFollow(p)}><Icon name="followUp" size={16} /></button>
+                        <button className="icon-btn" title="Print invoice" onClick={() => printInvoice(p, c, prod(p), settings)}><Icon name="print" size={16} /></button>
                         {isSnoozed(p) ? (
                           <button className="btn btn-sm" onClick={() => unsnooze(p.id)}>Unsnooze</button>
                         ) : (

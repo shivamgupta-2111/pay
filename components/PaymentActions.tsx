@@ -1,6 +1,6 @@
 "use client";
+import { Icon } from "@/components/Icon";
 import { useState } from "react";
-import { MessageCircle, Mail, MessageSquare, Copy, Phone, Check } from "lucide-react";
 import { useMe, useStore } from "@/store/useStore";
 import type { Channel, Payment, TemplateKind } from "@/lib/types";
 import { balance, fmtDate, money, timeAgo, todayISO } from "@/lib/format";
@@ -59,13 +59,13 @@ export function ReminderModal({ payment, onClose }: { payment: Payment; onClose:
       <textarea className="textarea" rows={8} value={msg} onChange={(e) => setMsg(e.target.value)} />
 
       <div className="channel-row">
-        <button className="btn btn-wa" disabled={!phone} onClick={() => send("whatsapp", waLink(phone, msg))}><MessageCircle size={16} /> WhatsApp</button>
-        <button className="btn" disabled={!phone} onClick={() => send("sms", smsLink(phone, msg))}><MessageSquare size={16} /> SMS</button>
-        <button className="btn" disabled={!email} onClick={() => send("email", mailLink(email, `Payment reminder – ${payment.invoiceNo ?? payment.title}`, msg))}><Mail size={16} /> Email</button>
-        <button className="btn" disabled={!phone} onClick={() => send("call", telLink(phone))}><Phone size={16} /> Call</button>
-        <button className="btn" onClick={() => { navigator.clipboard?.writeText(msg); send("copied"); }}><Copy size={16} /> Copy</button>
+        <button className="btn btn-wa" disabled={!phone} onClick={() => send("whatsapp", waLink(phone, msg))}><Icon name="whatsapp" size={16} /> WhatsApp</button>
+        <button className="btn" disabled={!phone} onClick={() => send("sms", smsLink(phone, msg))}><Icon name="sms" size={16} /> SMS</button>
+        <button className="btn" disabled={!email} onClick={() => send("email", mailLink(email, `Payment reminder – ${payment.invoiceNo ?? payment.title}`, msg))}><Icon name="email" size={16} /> Email</button>
+        <button className="btn" disabled={!phone} onClick={() => send("call", telLink(phone))}><Icon name="call" size={16} /> Call</button>
+        <button className="btn" onClick={() => { navigator.clipboard?.writeText(msg); send("copied"); }}><Icon name="copy" size={16} /> Copy</button>
       </div>
-      {done && <p className="ok-note"><Check size={14} /> Logged as reminded via {CHANNEL_LABEL[done]}.</p>}
+      {done && <p className="ok-note"><Icon name="check" size={14} /> Logged as reminded via {CHANNEL_LABEL[done]}.</p>}
 
       <History payment={payment} />
     </Modal>

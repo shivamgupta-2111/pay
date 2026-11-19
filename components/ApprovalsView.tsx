@@ -1,6 +1,6 @@
 "use client";
+import { Icon } from "@/components/Icon";
 import { useState } from "react";
-import { Check, X, ArrowUpRight, Trash2, Undo2 } from "lucide-react";
 import { useMe, useStore } from "@/store/useStore";
 import { fmtDate, money } from "@/lib/format";
 import { Modal } from "./ui";
@@ -40,11 +40,11 @@ export default function ApprovalsView() {
                 ))}
               </div>
               <div className="amt">{money(p.amount, settings.currency)}</div>
-              <button className="btn btn-danger btn-sm" onClick={() => { setRejecting(p.id); setReason(""); }}><X size={14} /> Reject</button>
+              <button className="btn btn-danger btn-sm" onClick={() => { setRejecting(p.id); setReason(""); }}><Icon name="close" size={14} /> Reject</button>
               {escalate ? (
-                <button className="btn btn-dark btn-sm" onClick={() => approve(p.id)}><ArrowUpRight size={14} /> Forward to CEO</button>
+                <button className="btn btn-dark btn-sm" onClick={() => approve(p.id)}><Icon name="arrowUpRight" size={14} /> Forward to CEO</button>
               ) : (
-                <button className="btn btn-success btn-sm" onClick={() => approve(p.id)}><Check size={14} /> {p.receipts.some((r) => !r.verified) ? "Verify" : "Approve"}</button>
+                <button className="btn btn-success btn-sm" onClick={() => approve(p.id)}><Icon name="check" size={14} /> {p.receipts.some((r) => !r.verified) ? "Verify" : "Approve"}</button>
               )}
             </div>
           );
@@ -62,8 +62,8 @@ export default function ApprovalsView() {
                 <div className="muted">{p.customer} · requested by {repName(p.repId)}</div>
               </div>
               <div className="amt">{money(p.amount, settings.currency)}</div>
-              <button className="btn btn-sm" onClick={() => updatePayment(p.id, { deleteRequested: false })}><Undo2 size={14} /> Keep</button>
-              <button className="btn btn-danger btn-sm" onClick={() => deletePayment(p.id)}><Trash2 size={14} /> Delete</button>
+              <button className="btn btn-sm" onClick={() => updatePayment(p.id, { deleteRequested: false })}><Icon name="undo" size={14} /> Keep</button>
+              <button className="btn btn-danger btn-sm" onClick={() => deletePayment(p.id)}><Icon name="delete" size={14} /> Delete</button>
             </div>
           ))}
           {!deletions.length && <div className="empty">No deletion requests.</div>}

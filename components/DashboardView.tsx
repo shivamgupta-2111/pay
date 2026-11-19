@@ -1,7 +1,7 @@
 "use client";
+import { Icon } from "@/components/Icon";
 import Link from "next/link";
 import { useState } from "react";
-import { AlertTriangle, Target, CheckCircle2, Repeat, BellRing, ArrowUpRight, Wallet } from "lucide-react";
 import { useMe, useStore } from "@/store/useStore";
 import type { Payment } from "@/lib/types";
 import { addDays, balance, effectiveStatus, fmtDate, money, monthKey, todayISO } from "@/lib/format";
@@ -48,13 +48,13 @@ export default function DashboardView() {
     <>
       <div className="grid grid-4">
         {isRep ? (
-          <StatCard dark label="Collected this month" value={m(myCollected)} hint={`${myPct}% of ${m(me.target)} target`} icon={<Target size={20} />} />
+          <StatCard dark label="Collected this month" value={m(myCollected)} hint={`${myPct}% of ${m(me.target)} target`} icon={<Icon name="target" size={20} />} />
         ) : (
-          <StatCard dark label="Monthly recurring revenue" value={m(mrr)} hint={`${subs.length} active subscriptions · ARR ${m(mrr * 12)}`} icon={<Repeat size={20} />} />
+          <StatCard dark label="Monthly recurring revenue" value={m(mrr)} hint={`${subs.length} active subscriptions · ARR ${m(mrr * 12)}`} icon={<Icon name="subscription" size={20} />} />
         )}
-        <StatCard label="Reminders to send today" value={String(toRemind.length)} hint={m(sum(toRemind))} icon={<BellRing size={20} />} />
-        <StatCard label="Overdue" value={m(sum(overdue))} hint={`${overdue.length} invoices · ${collectionRate}% collection rate`} icon={<AlertTriangle size={20} />} />
-        <StatCard label="Due in next 7 days" value={m(sum(next7))} hint={`${next7.length} invoices`} icon={<ArrowUpRight size={20} />} />
+        <StatCard label="Reminders to send today" value={String(toRemind.length)} hint={m(sum(toRemind))} icon={<Icon name="reminder" size={20} />} />
+        <StatCard label="Overdue" value={m(sum(overdue))} hint={`${overdue.length} invoices · ${collectionRate}% collection rate`} icon={<Icon name="warning" size={20} />} />
+        <StatCard label="Due in next 7 days" value={m(sum(next7))} hint={`${next7.length} invoices`} icon={<Icon name="arrowUpRight" size={20} />} />
       </div>
 
       {isRep && (
@@ -81,7 +81,7 @@ export default function DashboardView() {
                   </div>
                   <span className={`badge ${dl.cls}`}>{dl.text}</span>
                   <b style={{ width: 100, textAlign: "right" }}>{m(balance(p))}</b>
-                  <button className="btn btn-sm" onClick={() => setRemind(p)}><BellRing size={14} /> Remind</button>
+                  <button className="btn btn-sm" onClick={() => setRemind(p)}><Icon name="reminder" size={14} /> Remind</button>
                 </div>
               );
             })}
@@ -91,11 +91,11 @@ export default function DashboardView() {
         <div className="card">
           <div className="card-title">{isRep ? "My numbers" : "Cash position"}</div>
           <div className="reminder-list">
-            <div><Wallet size={18} color="var(--orange-brand)" /><span style={{ flex: 1 }}>Collected (all time)</span><b>{m(received)}</b></div>
-            {!isRep && <div><Wallet size={18} color="var(--text-muted)" /><span style={{ flex: 1 }}>Expenses paid</span><b>{m(spent)}</b></div>}
-            <div><AlertTriangle size={18} color="var(--red)" /><span style={{ flex: 1 }}>Total outstanding</span><b>{m(sum(open))}</b></div>
-            <div><CheckCircle2 size={18} color="var(--blue)" /><span style={{ flex: 1 }}>Awaiting approval</span><b>{awaiting.length}</b></div>
-            <div><Repeat size={18} color="var(--green)" /><span style={{ flex: 1 }}>Active subscriptions</span><b>{subs.length}</b></div>
+            <div><Icon name="wallet" size={18} color="var(--orange-brand)" /><span style={{ flex: 1 }}>Collected (all time)</span><b>{m(received)}</b></div>
+            {!isRep && <div><Icon name="wallet" size={18} color="var(--text-muted)" /><span style={{ flex: 1 }}>Expenses paid</span><b>{m(spent)}</b></div>}
+            <div><Icon name="warning" size={18} color="var(--red)" /><span style={{ flex: 1 }}>Total outstanding</span><b>{m(sum(open))}</b></div>
+            <div><Icon name="approvals" size={18} color="var(--blue)" /><span style={{ flex: 1 }}>Awaiting approval</span><b>{awaiting.length}</b></div>
+            <div><Icon name="subscription" size={18} color="var(--green)" /><span style={{ flex: 1 }}>Active subscriptions</span><b>{subs.length}</b></div>
           </div>
         </div>
       </div>

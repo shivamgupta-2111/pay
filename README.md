@@ -50,6 +50,25 @@ npm run dev        # http://localhost:3000 → pick a portal on the login screen
 
 Edit `lib/permissions.ts` to change any of these.
 
+## Changing the main logo
+Put your logo file in `public/` (PNG, SVG, JPG or WEBP) and set the path in **`components/Logo.tsx`**:
+```ts
+export const LOGO_SRC = "/logo.png";
+export const SHOW_NAME = false;   // if your logo already contains the company name
+```
+It's used on the sidebar, the login screen and the browser-tab icon.
+
+## Changing icons
+All icons live in **one file: `components/Icon.tsx`**. Every screen uses `<Icon name="…" />`.
+
+- **Another built-in icon** – pick one at https://lucide.dev/icons, import it and change the line, e.g. `whatsapp: Send,`
+- **Your own file** – drop it in `public/icons/` and add it to `CUSTOM_ICONS`:
+  ```ts
+  whatsapp: "/icons/whatsapp.svg",                    // single colour – follows text/button colour
+  whatsapp: { src: "/icons/wa.png", tint: false },    // keeps the image's own colours
+  ```
+  (`whatsapp` is already set up this way as a working example.)
+
 ## Structure
 ```
 app/{ceo,admin,rep}/…            routes (reminders, subscriptions, products, customers, payments, …)

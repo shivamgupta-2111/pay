@@ -1,8 +1,6 @@
 "use client";
+import { Icon } from "@/components/Icon";
 import { useMemo, useState } from "react";
-import {
-  Plus, Pencil, Copy, Trash2, Power, Search, Pause, Play, XCircle, ReceiptText, History, MessageCircle, Phone, FileText, Repeat,
-} from "lucide-react";
 import { useMe, useStore } from "@/store/useStore";
 import { can } from "@/lib/permissions";
 import type { Customer, Cycle, Payment, Product, Subscription } from "@/lib/types";
@@ -32,8 +30,8 @@ export function ProductsView() {
   return (
     <>
       <div className="toolbar">
-        <div className="search"><Search size={16} /><input className="input" placeholder="Search products…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
-        {manage && <button className="btn btn-primary" onClick={() => setEditing({ cycle: "monthly", taxRate: 18, active: true })}><Plus size={16} /> Add product</button>}
+        <div className="search"><Icon name="search" size={16} /><input className="input" placeholder="Search products…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
+        {manage && <button className="btn btn-primary" onClick={() => setEditing({ cycle: "monthly", taxRate: 18, active: true })}><Icon name="add" size={16} /> Add product</button>}
       </div>
       <div className="product-grid">
         {list.map((p) => {
@@ -54,13 +52,13 @@ export function ProductsView() {
                 <div><b>{money(st.mrr, settings.currency)}</b>MRR</div>
                 {manage && (
                   <div className="actions" style={{ marginLeft: "auto", alignItems: "center" }}>
-                    <button className="icon-btn" title="Edit" onClick={() => setEditing(p)}><Pencil size={16} /></button>
-                    <button className="icon-btn" title="Duplicate" onClick={() => setEditing({ ...p, id: undefined, name: `${p.name} (copy)`, sku: `${p.sku}-2` })}><Copy size={16} /></button>
-                    <button className="icon-btn" title={p.active ? "Deactivate" : "Activate"} onClick={() => saveProduct({ ...p, active: !p.active })}><Power size={16} /></button>
+                    <button className="icon-btn" title="Edit" onClick={() => setEditing(p)}><Icon name="edit" size={16} /></button>
+                    <button className="icon-btn" title="Duplicate" onClick={() => setEditing({ ...p, id: undefined, name: `${p.name} (copy)`, sku: `${p.sku}-2` })}><Icon name="copy" size={16} /></button>
+                    <button className="icon-btn" title={p.active ? "Deactivate" : "Activate"} onClick={() => saveProduct({ ...p, active: !p.active })}><Icon name="power" size={16} /></button>
                     <button
                       className="icon-btn" title={st.any ? "Has subscriptions – deactivate instead" : "Delete"} disabled={st.any}
                       onClick={() => confirm(`Delete ${p.name}?`) && deleteProduct(p.id)}
-                    ><Trash2 size={16} /></button>
+                    ><Icon name="delete" size={16} /></button>
                   </div>
                 )}
               </div>
@@ -139,7 +137,7 @@ export function SubscriptionsView() {
   return (
     <>
       <div className="grid grid-4">
-        <StatCard dark label="Monthly recurring revenue" value={money(active.reduce((a, s) => a + mrrOf(s), 0), cur)} hint={`ARR ${money(active.reduce((a, s) => a + mrrOf(s), 0) * 12, cur)}`} icon={<Repeat size={20} />} />
+        <StatCard dark label="Monthly recurring revenue" value={money(active.reduce((a, s) => a + mrrOf(s), 0), cur)} hint={`ARR ${money(active.reduce((a, s) => a + mrrOf(s), 0) * 12, cur)}`} icon={<Icon name="subscription" size={20} />} />
         <StatCard label="Active subscriptions" value={String(active.length)} hint={`${new Set(active.map((s) => s.customerId)).size} customers`} />
         <StatCard label="Next invoices (2 wks)" value={String(renewals.length)} hint={money(renewals.reduce((a, s) => a + s.price, 0), cur)} />
         <StatCard label="Paused / cancelled" value={`${scoped.filter((s) => s.status === "paused").length} / ${scoped.filter((s) => s.status === "cancelled").length}`} hint="Churn watch" />
@@ -147,14 +145,14 @@ export function SubscriptionsView() {
 
       <div className="card mt">
         <div className="toolbar">
-          <div className="search"><Search size={16} /><input className="input" placeholder="Search customer or product…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
+          <div className="search"><Icon name="search" size={16} /><input className="input" placeholder="Search customer or product…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
           <select className="select" value={status} onChange={(e) => setStatus(e.target.value)}>
             <option value="all">All status</option><option value="active">Active</option><option value="paused">Paused</option><option value="cancelled">Cancelled</option>
           </select>
           <select className="select" value={prod} onChange={(e) => setProd(e.target.value)}>
             <option value="all">All products</option>{products.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
-          {can(me.role, "subscriptions:create") && <button className="btn btn-primary" onClick={() => setCreating(true)}><Plus size={16} /> New subscription</button>}
+          {can(me.role, "subscriptions:create") && <button className="btn btn-primary" onClick={() => setCreating(true)}><Icon name="add" size={16} /> New subscription</button>}
         </div>
         <div className="table-wrap">
           <table>
@@ -174,12 +172,12 @@ export function SubscriptionsView() {
                   {me.role !== "rep" && <td>{rName(s.repId)}</td>}
                   <td>
                     <div className="actions">
-                      <button className="icon-btn" title="Invoices & history" onClick={() => setHistory(s)}><History size={16} /></button>
-                      {manage && s.status === "active" && <button className="icon-btn" title="Generate next invoice now" onClick={() => confirm(`Create invoice for ${fmtDate(s.nextDueDate)} now?`) && billNow(s.id)}><ReceiptText size={16} /></button>}
-                      {manage && s.status !== "cancelled" && <button className="icon-btn" title="Edit price / cycle / rep" onClick={() => setEditing(s)}><Pencil size={16} /></button>}
-                      {manage && s.status === "active" && <button className="icon-btn" title="Pause" onClick={() => setSubStatus(s.id, "paused")}><Pause size={16} /></button>}
-                      {manage && s.status === "paused" && <button className="icon-btn" title="Resume" onClick={() => setSubStatus(s.id, "active")}><Play size={16} /></button>}
-                      {manage && s.status !== "cancelled" && <button className="icon-btn" title="Cancel" onClick={() => setCancelling(s)}><XCircle size={16} /></button>}
+                      <button className="icon-btn" title="Invoices & history" onClick={() => setHistory(s)}><Icon name="history" size={16} /></button>
+                      {manage && s.status === "active" && <button className="icon-btn" title="Generate next invoice now" onClick={() => confirm(`Create invoice for ${fmtDate(s.nextDueDate)} now?`) && billNow(s.id)}><Icon name="invoice" size={16} /></button>}
+                      {manage && s.status !== "cancelled" && <button className="icon-btn" title="Edit price / cycle / rep" onClick={() => setEditing(s)}><Icon name="edit" size={16} /></button>}
+                      {manage && s.status === "active" && <button className="icon-btn" title="Pause" onClick={() => setSubStatus(s.id, "paused")}><Icon name="pause" size={16} /></button>}
+                      {manage && s.status === "paused" && <button className="icon-btn" title="Resume" onClick={() => setSubStatus(s.id, "active")}><Icon name="resume" size={16} /></button>}
+                      {manage && s.status !== "cancelled" && <button className="icon-btn" title="Cancel" onClick={() => setCancelling(s)}><Icon name="cancel" size={16} /></button>}
                       {manage && s.status === "cancelled" && <button className="btn btn-sm" onClick={() => setSubStatus(s.id, "active")}>Reactivate</button>}
                     </div>
                   </td>
@@ -357,8 +355,8 @@ export function CustomersView() {
   return (
     <div className="card">
       <div className="toolbar">
-        <div className="search"><Search size={16} /><input className="input" placeholder="Search name, contact, phone, city…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
-        {can(me.role, "customers:create") && <button className="btn btn-primary" onClick={() => setEditing({ repId: me.role === "rep" ? me.id : users.find((u) => u.role === "rep")?.id })}><Plus size={16} /> Add customer</button>}
+        <div className="search"><Icon name="search" size={16} /><input className="input" placeholder="Search name, contact, phone, city…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
+        {can(me.role, "customers:create") && <button className="btn btn-primary" onClick={() => setEditing({ repId: me.role === "rep" ? me.id : users.find((u) => u.role === "rep")?.id })}><Icon name="add" size={16} /> Add customer</button>}
       </div>
       <div className="table-wrap">
         <table>
@@ -374,11 +372,11 @@ export function CustomersView() {
                 {me.role !== "rep" && <td>{users.find((u) => u.id === c.repId)?.name}</td>}
                 <td>
                   <div className="actions">
-                    <a className="icon-btn wa" title="WhatsApp" href={waLink(c.phone, `Hi ${c.contact}, `)} target="_blank" rel="noreferrer"><MessageCircle size={16} /></a>
-                    <a className="icon-btn" title="Call" href={telLink(c.phone)}><Phone size={16} /></a>
-                    <button className="icon-btn" title="Statement" onClick={() => setViewing(c)}><FileText size={16} /></button>
-                    {can(me.role, "subscriptions:create") && <button className="icon-btn" title="New subscription" onClick={() => setSubFor(c.id)}><Repeat size={16} /></button>}
-                    {canEdit(c) && <button className="icon-btn" title="Edit" onClick={() => setEditing(c)}><Pencil size={16} /></button>}
+                    <a className="icon-btn wa" title="WhatsApp" href={waLink(c.phone, `Hi ${c.contact}, `)} target="_blank" rel="noreferrer"><Icon name="whatsapp" size={16} /></a>
+                    <a className="icon-btn" title="Call" href={telLink(c.phone)}><Icon name="call" size={16} /></a>
+                    <button className="icon-btn" title="Statement" onClick={() => setViewing(c)}><Icon name="statement" size={16} /></button>
+                    {can(me.role, "subscriptions:create") && <button className="icon-btn" title="New subscription" onClick={() => setSubFor(c.id)}><Icon name="subscription" size={16} /></button>}
+                    {canEdit(c) && <button className="icon-btn" title="Edit" onClick={() => setEditing(c)}><Icon name="edit" size={16} /></button>}
                   </div>
                 </td>
               </tr>
@@ -455,7 +453,7 @@ function Statement({ customer, onClose }: { customer: Customer; onClose: () => v
           </span>
         ))}
       </div>
-      <button className="btn btn-wa" disabled={!open.length} onClick={sendStatement} style={{ marginBottom: 14 }}><MessageCircle size={16} /> Send statement on WhatsApp</button>
+      <button className="btn btn-wa" disabled={!open.length} onClick={sendStatement} style={{ marginBottom: 14 }}><Icon name="whatsapp" size={16} /> Send statement on WhatsApp</button>
       <InvoiceTable rows={inv} />
     </Modal>
   );

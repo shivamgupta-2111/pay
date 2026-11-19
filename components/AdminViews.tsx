@@ -1,6 +1,6 @@
 "use client";
+import { Icon } from "@/components/Icon";
 import { useState } from "react";
-import { Plus, Pencil, X, UserX, UserCheck } from "lucide-react";
 import { useMe, useStore } from "@/store/useStore";
 import { ROLE_LABEL } from "@/lib/permissions";
 import type { User } from "@/lib/types";
@@ -17,7 +17,7 @@ export function UsersView() {
     <div className="card">
       <div className="card-title">
         <span>Team members</span>
-        <button className="btn btn-primary" onClick={() => setEditing({ role: "rep", active: true, target: 300000, region: "North" })}><Plus size={16} /> Add rep</button>
+        <button className="btn btn-primary" onClick={() => setEditing({ role: "rep", active: true, target: 300000, region: "North" })}><Icon name="add" size={16} /> Add rep</button>
       </div>
       <div className="table-wrap">
         <table>
@@ -41,9 +41,9 @@ export function UsersView() {
                     <div className="actions">
                       {locked ? <span className="muted">Protected</span> : (
                         <>
-                          <button className="icon-btn" title="Edit" onClick={() => setEditing(u)}><Pencil size={16} /></button>
+                          <button className="icon-btn" title="Edit" onClick={() => setEditing(u)}><Icon name="edit" size={16} /></button>
                           <button className="icon-btn" title={u.active ? "Deactivate" : "Activate"} onClick={() => saveUser({ ...u, active: !u.active })}>
-                            {u.active ? <UserX size={16} /> : <UserCheck size={16} />}
+                            {u.active ? <Icon name="userDeactivate" size={16} /> : <Icon name="userActivate" size={16} />}
                           </button>
                         </>
                       )}
@@ -156,13 +156,13 @@ function ListEditor({ title, items, onChange }: { title: string; items: string[]
       <div className="card-title">{title}</div>
       <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
         <input className="input" value={v} placeholder={`Add ${title.toLowerCase()}…`} onChange={(e) => setV(e.target.value)} onKeyDown={(e) => e.key === "Enter" && add()} />
-        <button className="btn btn-primary" onClick={add}><Plus size={16} /></button>
+        <button className="btn btn-primary" onClick={add}><Icon name="add" size={16} /></button>
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
         {items.map((c) => (
           <span key={c} className="badge b-orange" style={{ paddingRight: 4 }}>
             {c}
-            <button className="icon-btn" style={{ padding: 2 }} onClick={() => onChange(items.filter((x) => x !== c))}><X size={12} /></button>
+            <button className="icon-btn" style={{ padding: 2 }} onClick={() => onChange(items.filter((x) => x !== c))}><Icon name="close" size={12} /></button>
           </span>
         ))}
       </div>
